@@ -1,5 +1,8 @@
 package com.napolitano.cordova.plugin.intent;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -43,6 +46,17 @@ public class IntentPlugin extends CordovaPlugin {
     @Override
     public boolean execute(final String action, final JSONArray data, final CallbackContext callbackContext) {
         Log.d(pluginName, pluginName + " called with options: " + data);
+        System.out.println("yulin724 alksdjalksdjalksdjalksdjk");
+
+        if (action.equals("getFileContent")) {
+            try {
+                String content = getFileContent(data.getString(0));
+                callbackContext.success(content);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
 
         Class params[] = new Class[2];
         params[0] = JSONArray.class;
@@ -58,14 +72,45 @@ public class IntentPlugin extends CordovaPlugin {
         return true;
     }
 
+    public String getFileContent(String path) {
+        System.out.println("getFileContent, " + path);
+        return readFileContent(path);
+    }
+
+    private String readFileContent(String targetFilePath) {
+        File file = new File(targetFilePath);
+        String fileContent = "";
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(file);
+            StringBuilder sb = null;
+            while (fileInputStream.available() > 0) {
+                if (null == sb) sb = new StringBuilder();
+
+                sb.append((char) fileInputStream.read());
+            }
+            if (null != sb) {
+                fileContent = sb.toString();
+                // This is your fileContent in String.
+            }
+            fileInputStream.close();
+        } catch (java.io.IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return fileContent;
+    }
+
+
     /**
      * Send a JSON representation of the cordova intent back to the caller
      *
      * @param data
      * @param context
      */
-    public boolean getCordovaIntent (final JSONArray data, final CallbackContext context) {
-        if(data.length() != 0) {
+    public boolean getCordovaIntent(final JSONArray data, final CallbackContext context) {
+        if (data.length() != 0) {
             context.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
             return false;
         }
@@ -82,8 +127,8 @@ public class IntentPlugin extends CordovaPlugin {
      * @param context
      * @return
      */
-    public boolean setNewIntentHandler (final JSONArray data, final CallbackContext context) {
-        if(data.length() != 1) {
+    public boolean setNewIntentHandler(final JSONArray data, final CallbackContext context) {
+        if (data.length() != 1) {
             context.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
             return false;
         }
@@ -126,7 +171,7 @@ public class IntentPlugin extends CordovaPlugin {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             clipData = intent.getClipData();
-            if(clipData != null) {
+            if (clipData != null) {
                 int clipItemCount = clipData.getItemCount();
                 items = new JSONObject[clipItemCount];
 
@@ -141,7 +186,7 @@ public class IntentPlugin extends CordovaPlugin {
                         items[i].put("text", item.getText());
                         items[i].put("uri", item.getUri());
 
-                        if(item.getUri() != null) {
+                        if (item.getUri() != null) {
                             String type = cR.getType(item.getUri());
                             String extension = mime.getExtensionFromMimeType(cR.getType(item.getUri()));
 
@@ -163,7 +208,7 @@ public class IntentPlugin extends CordovaPlugin {
             intentJSON = new JSONObject();
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if(items != null) {
+                if (items != null) {
                     intentJSON.put("clipItems", new JSONArray(items));
                 }
             }
@@ -226,15 +271,15 @@ public class IntentPlugin extends CordovaPlugin {
     }
 
     public boolean getRealPathFromContentUrl(final JSONArray data, final CallbackContext context) {
-        if(data.length() != 1) {
+        if (data.length() != 1) {
             context.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
             return false;
         }
         ContentResolver cR = this.cordova.getActivity().getApplicationContext().getContentResolver();
         Cursor cursor = null;
         try {
-            String[] proj = { MediaStore.Images.Media.DATA };
-            cursor = cR.query(Uri.parse(data.getString(0)),  proj, null, null, null);
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = cR.query(Uri.parse(data.getString(0)), proj, null, null, null);
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             cursor.moveToFirst();
 
