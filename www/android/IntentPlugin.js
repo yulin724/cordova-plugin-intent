@@ -14,6 +14,19 @@ IntentPlugin.prototype.getCordovaIntent = function(successCallback, failureCallb
     );
 };
 
+IntentPlugin.prototype.getFileContent = function(filePath, successCallback, failureCallback) {
+    'use strict';
+
+    return cordova.exec (
+        successCallback,
+        failureCallback,
+        "IntentPlugin",
+        "getFileContent",
+        [filePath]
+    );
+};
+
+
 IntentPlugin.prototype.setNewIntentHandler = function(method) {
     'use strict';
 
