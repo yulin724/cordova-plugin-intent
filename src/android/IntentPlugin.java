@@ -1,8 +1,12 @@
 package com.napolitano.cordova.plugin.intent;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -74,32 +78,48 @@ public class IntentPlugin extends CordovaPlugin {
 
     public String getFileContent(String path) {
         System.out.println("getFileContent, " + path);
-        return readFileContent(path);
-    }
-
-    private String readFileContent(String targetFilePath) {
-        File file = new File(targetFilePath);
-        String fileContent = "";
-        FileInputStream fileInputStream = null;
         try {
-            fileInputStream = new FileInputStream(file);
-            StringBuilder sb = null;
-            while (fileInputStream.available() > 0) {
-                if (null == sb) sb = new StringBuilder();
-
-                sb.append((char) fileInputStream.read());
-            }
-            if (null != sb) {
-                fileContent = sb.toString();
-                // This is your fileContent in String.
-            }
-            fileInputStream.close();
-        } catch (java.io.IOException e) {
-            // TODO Auto-generated catch block
+            return readFileContent(path);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
-        return fileContent;
+        return "";
+    }
+
+    private String readFileContent(String targetFilePath) throws FileNotFoundException, UnsupportedEncodingException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(targetFilePath), "utf-8"));
+        String strLine= null;
+        try {
+            strLine = reader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        File file = new File(targetFilePath);
+//        String fileContent = "";
+//        FileInputStream fileInputStream = null;
+//        try {
+//            fileInputStream = new FileInputStream(file);
+//            StringBuilder sb = null;
+//            while (fileInputStream.available() > 0) {
+//                if (null == sb) sb = new StringBuilder();
+//
+//                sb.append((char) fileInputStream.read());
+//            }
+//            if (null != sb) {
+//                fileContent = sb.toString();
+//                // This is your fileContent in String.
+//            }
+//            fileInputStream.close();
+//        } catch (java.io.IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+
+        return strLine;
     }
 
 
