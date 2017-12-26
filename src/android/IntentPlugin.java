@@ -54,7 +54,9 @@ public class IntentPlugin extends CordovaPlugin {
 
         if (action.equals("getFileContent")) {
             try {
-                String content = getFileContent(data.getString(0));
+                String filename = "file://" + data.getString(0);
+                Uri uri = Uri.parse(filename);
+                String content = getFileContent(uri.getPath());
                 callbackContext.success(content);
             } catch (JSONException e) {
                 e.printStackTrace();
